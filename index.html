@@ -578,21 +578,16 @@
                     }
                     joystickHandle.style.transform = `translate(${dx}px, ${dy}px)`;
                     
-                    // Horizontal control for rotation
-                    input.rotation = Math.max(-1, Math.min(1, dx / joystickMaxDist));
-                    
-                    // Vertical control for thrust/decelerate
-                    const yRatio = -dy / joystickMaxDist; // Invert dy so up is positive
-                    if (yRatio > 0.25) { // Threshold for thrust
-                        input.up = true;
-                        input.down = false;
-                    } else if (yRatio < -0.25) { // Threshold for decelerate
-                        input.up = false;
-                        input.down = true;
-                    } else {
-                        input.up = false;
-                        input.down = false;
+                    // INSTANT ROTATION: set ship angle to joystick direction (if ship exists)
+                    if (game.player && game.player.active) {
+                        // Joystick up is -Y, so atan2(-dy, dx)
+                        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) { // ignore tiny movements
+                            game.player.angle = Math.atan2(dy, dx);
+                        }
                     }
+                    // Always thrust when joystick is pressed
+                    input.up = true;
+                    input.down = false;
                 }, false);
 
                 mobilePauseButton.addEventListener('click', togglePause);
